@@ -1,0 +1,44 @@
+version: "3.9"
+    
+services:
+  db:
+    image: mysql:5.7
+    container_name: "mysql_5.7"
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: wordpress
+      MYSQL_DATABASE: wp_manager_site
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+    networks:
+      wp_network:
+        ipv4_address: 193.18.0.3
+    
+  wordpress:
+    container_name: "example_wordpress"
+    depends_on:
+      - db
+    image: wordpress:latest
+    volumes:
+      - ./:/var/www/html
+      - .env/:/var/www/html/.env
+    env_file: .env
+    ports:
+      - "8000:80"
+    restart: always
+    networks:
+      wp_network:
+        ipv4_address: 193.18.0.2
+
+volumes:
+  db_data: {}
+  wordpress: {}
+
+networks:
+  wp_network:
+    ipam:
+      driver: default
+      config:
+        - subnet: 193.18.0.0/16
