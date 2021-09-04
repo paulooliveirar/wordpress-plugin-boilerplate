@@ -25,6 +25,9 @@ class Template
 
         foreach($items as $item)
         {
+            if(empty($item['function'])){
+                $item['function'] = [&$this, "my_plugin_routes"];
+            }
             $this->create_new_item($item);
         }
 
@@ -58,7 +61,6 @@ class Template
             $item['capability'],
             $item['menu_slug'],
             $item['function'], 
-            $item['icon_url'], 
             $item['position']
         );
 
@@ -77,6 +79,16 @@ class Template
                 'function' => '',
                 'icon_url' => 'dashicons-welcome-widgets-menus',
                 'position' => 30
+            ],
+            [
+                'type' => SUBMENU_TYPE,
+                'parent_slug' => $this->menu_slug,
+                'page_title' => __( 'Manager Database', 'pbpm' ),
+                'menu_title' =>__( 'Manager Database', 'pbpm' ),
+                'capability' => 'manage_options',
+                'menu_slug' => 'my-menu-manager-database',
+                'function' => '',
+                'position' => 0
             ],
             [
                 'type' => SUBMENU_TYPE,
@@ -141,20 +153,24 @@ class Template
             return array_merge($newLinks, $links);
         }   
    }
+
+   public function my_plugin_routes():void {
+        $link = trim($_GET['page']);
+        $file = PLUGIN_PATH_DIR . "admin/view/$link.html";
+
+        $class_methods = get_class_methods(new Template());
+
+        foreach ($class_methods as $method_name) {
+            if($link == $method_name){
+                $this->$method_name();
+            }
+        }
+
+        if(!is_file($file) && !file_exists($file)){
+            include_once PLUGIN_PATH_DIR . 'admin/view/error-404.html';
+            wp_die();
+        }
+
+        include_once $file;
+    }
 }
-
-// function popup_build_admin_management_page() {
-	
-// 	switch (trim($_GET['page'])) {
-// 		case 'popup-builder-pm-form':
-// 			include_once POPUP__PLUGIN_DIR . '/includes/form-template.php';
-// 			break;
-// 		case 'popup-builder-pm-config':
-// 			include_once POPUP__PLUGIN_DIR . '/includes/pp-conf-popup.php';
-// 			break;
-
-// 		default:
-// 			include_once POPUP__PLUGIN_DIR . '/includes/pp-acp-page.php';
-// 			break;
-// 	}
-// }
