@@ -22,8 +22,9 @@ services:
       - db
     image: wordpress:latest
     volumes:
-      - ./:/var/www/html
-      - .env/:/var/www/html/.env
+      - wordpress:/var/www/html
+      - ./wp-content/plugins/example-plugin:/var/www/html/wp-content/plugins/example-plugin
+      - .env:/var/www/html/.env
     env_file: .env
     ports:
       - "8000:80"

@@ -1,18 +1,25 @@
 <?php 
 
-namespace ExamplePlugin\Admin\Template;
+namespace ExamplePlugin\Admin;
+
+use ExamplePlugin\Admin\CustomTemplate;
+
+require_once PLUGIN_PATH_DIR . 'admin/custom-template.php';
 
 const MENU_TYPE = 'menu';
 const SUBMENU_TYPE = 'submenu';
 
-class Template
+class Template extends CustomTemplate
 {
     private $menu_slug = 'my-menu';
 
     function __construct()
-    {
+    {        
         add_action( 'admin_menu', [$this, 'create_menu'], 10);
         add_filter( 'plugin_action_links', [$this, 'my_plugin_action_links'], 10 , 4);
+
+        add_action('wp_ajax_select', 'select');
+        add_action('wp_ajax_nopriv_select', 'select');
     }
 
     public function create_menu()
@@ -83,16 +90,6 @@ class Template
             [
                 'type' => SUBMENU_TYPE,
                 'parent_slug' => $this->menu_slug,
-                'page_title' => __( 'Manager Database', 'pbpm' ),
-                'menu_title' =>__( 'Manager Database', 'pbpm' ),
-                'capability' => 'manage_options',
-                'menu_slug' => 'my-menu-manager-database',
-                'function' => '',
-                'position' => 0
-            ],
-            [
-                'type' => SUBMENU_TYPE,
-                'parent_slug' => $this->menu_slug,
                 'page_title' => __( 'Add New Item', 'pbpm' ),
                 'menu_title' =>__( 'Add New', 'pbpm' ),
                 'capability' => 'manage_options',
@@ -128,7 +125,27 @@ class Template
                 'capability' => 'manage_options',
                 'menu_slug' => 'my-menu-about',
                 'function' => '',
-                'position' => 2
+                'position' => 3
+            ],
+            [
+                'type' => SUBMENU_TYPE,
+                'parent_slug' => $this->menu_slug,
+                'page_title' => __( 'Manager Database', 'pbpm' ),
+                'menu_title' =>__( 'Manager Database', 'pbpm' ),
+                'capability' => 'manage_options',
+                'menu_slug' => 'my-menu-manager-database',
+                'function' => '',
+                'position' => 4
+            ],
+            [
+                'type' => SUBMENU_TYPE,
+                'parent_slug' => $this->menu_slug,
+                'page_title' => __( 'Custom Page', 'pbpm' ),
+                'menu_title' =>__( 'Custom Page', 'pbpm' ),
+                'capability' => 'manage_options',
+                'menu_slug' => 'custom-page',
+                'function' => '',
+                'position' => 5
             ],
         ];
     }
@@ -156,21 +173,30 @@ class Template
 
    public function my_plugin_routes():void {
         $link = trim($_GET['page']);
-        $file = PLUGIN_PATH_DIR . "admin/view/$link.html";
+        $file = PLUGIN_PATH_DIR . "admin/view/$link.php";
 
         $class_methods = get_class_methods(new Template());
 
         foreach ($class_methods as $method_name) {
-            if($link == $method_name){
+            if(str_replace(['-', ' '], '_', $link) == $method_name){
                 $this->$method_name();
+                return;
             }
         }
 
         if(!is_file($file) && !file_exists($file)){
-            include_once PLUGIN_PATH_DIR . 'admin/view/error-404.html';
-            wp_die();
+            include_once PLUGIN_PATH_DIR . 'admin/view/error-404.php';
         }
 
         include_once $file;
+    }
+    
+    public function custom_page(){
+        include_once plugin_dir_url( __FILE__ ) . 'view/css/main.css';
+        echo "
+        <link rel='stylesheet' type='text/css' media='screen' href='" . plugin_dir_url( __FILE__ ) . "view/css/main.css'>
+        <h1>PAGE CUSTOM</h1>";
+        //$conn = new \ExamplePlugin\Admin\Connection();
+        //var_dump($conn->getConnect());
     }
 }

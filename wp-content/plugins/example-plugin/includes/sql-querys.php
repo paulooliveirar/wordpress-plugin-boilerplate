@@ -1,9 +1,10 @@
 <?php 
 
-namespace ExamplePlugin\SqlQuerys;
-use ExamplePlugin\SqlQuerysInterface\SqlQuerysInterface;
+namespace ExamplePlugin\Includes;
+use ExamplePlugin\SqlQuerysInterface;
 
-class SqlQuerys implements SqlQuerysInterface extends
+include_once 'sql-querys-interface.php';
+class SqlQuerys implements SqlQuerysInterface
 {
 
     function __construct()
@@ -13,13 +14,13 @@ class SqlQuerys implements SqlQuerysInterface extends
         $this->selectItem($query, $args);
     }
 
-    private function selectItem( $query, $args )
+    public function selectItem( $query, $args )
     {
-
+        return $query;
     }
 
-    private function insertItem( $query, $args )
+    public function insertItem( $query, $args )
     {
-
+        return $query;
     }
 }

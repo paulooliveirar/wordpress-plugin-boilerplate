@@ -2,7 +2,7 @@
 
 namespace ExamplePlugin\IncludesExamplePluginActivator;
 
-use ExamplePlugin\Includes\QueryBuild\Connection\Connection;
+use ExamplePlugin\Includes\QueryBuild\Connection;
 
 require_once (dirname(__FILE__) . '/query-build/connection.php');
 

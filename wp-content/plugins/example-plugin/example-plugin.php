@@ -23,8 +23,6 @@
  * Domain Path:       /languages
  */
 
-use ExamplePlugin\Admin\Template\Template;
-
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
@@ -83,7 +81,7 @@ register_uninstall_hook(__FILE__, 'example_plugin_uninstall');
  * The core plugin class that is used to define internationalization,
  * admin-specific hooks, and public-facing site hooks.
  */
-//require plugin_dir_path( __FILE__ ) . 'includes/class-example-plugin.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-example-plugin.php';
 
 /**
  * Begins execution of the plugin.
@@ -94,10 +92,20 @@ register_uninstall_hook(__FILE__, 'example_plugin_uninstall');
  *
  * @since    1.0.0
  */
-function rende_plugin(){
-    if(is_admin()){ require_once PLUGIN_PATH_DIR . '/admin/template.php'; }
-    if(!is_admin()){ require_once PLUGIN_PATH_DIR . '/public/template.php';}
-    new \ExamplePlugin\Admin\Template\Template();
+function render_plugin(){
+    if(is_admin()){ 
+        require_once PLUGIN_PATH_DIR . 'includes/class-example-plugin.php';
+        require_once PLUGIN_PATH_DIR . 'admin/template.php'; 
+        require_once PLUGIN_PATH_DIR . 'includes/sql-querys.php';
+        $plugin = new \ExamplePlugin\Includes\ExamplePlugin();
+        $plugin->run();
+        new \ExamplePlugin\Admin\Template();
+        new \ExamplePlugin\Includes\SqlQuerys();
+    }
+
+    if(!is_admin()){
+        //require_once PLUGIN_PATH_DIR . '/public/template.php';
+    }
 }
 
-rende_plugin();
+render_plugin();

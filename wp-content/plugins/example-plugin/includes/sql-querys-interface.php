@@ -1,6 +1,6 @@
 <?php
 
-namespace ExamplePlugin\SqlQuerysInterface;
+namespace ExamplePlugin;
 
 interface SqlQuerysInterface {
 
