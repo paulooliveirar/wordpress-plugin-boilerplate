@@ -1,17 +1,28 @@
-# ignore everything in the root except the "wp-content" directory.
+# WordPress core (installed from the official Docker image — not versioned)
+/*
+!.gitignore
+!LICENSE
+!README.md
+!docker-compose.yml
+!install.sh
+!create-plugin.sh
+!.env.sample
+!Dockerfile
+!Makefile
+!docker/
 !wp-content/
 
-# ignore everything in the "wp-content" directory, except:
-# "mu-plugins", "plugins", "themes" directory
+# wp-content: only mu-plugins, plugins and themes
 wp-content/*
 !wp-content/mu-plugins/
-!wp-content/plugins/
+wp-content/plugins/
 !wp-content/themes/
 
 # ignore these plugins
 wp-content/plugins/hello.php
+wp-content/plugins/example-plugin/
 
-# ignore specific themes
+# ignore default themes shipped with WordPress
 wp-content/themes/twenty*/
 
 # ignore node dependency directories
@@ -22,5 +33,8 @@ node_modules/
 *.sql
 *.sqlite
 
-#ignore .env 
+# ignore .env
 .env
+
+# database dumps
+backups/

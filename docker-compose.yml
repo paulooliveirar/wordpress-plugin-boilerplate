@@ -1,9 +1,7 @@
-version: "3.9"
-    
 services:
   db:
-    image: mysql:5.7
-    container_name: "mysql_5.7"
+    image: mysql:8.0
+    container_name: "mysql_8.0"
     volumes:
       - db_data:/var/lib/mysql
     restart: always
@@ -12,19 +10,39 @@ services:
       MYSQL_DATABASE: wp_manager_site
       MYSQL_USER: admin
       MYSQL_PASSWORD: admin
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uadmin", "-padmin"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
     networks:
       wp_network:
         ipv4_address: 193.18.0.3
-    
+
   wordpress:
-    container_name: "example_wordpress"
+    container_name: "wordpress"
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        WP_VERSION: ${WP_VERSION:-latest}
+    image: wp-plugin-boilerplate/wordpress:latest
     depends_on:
-      - db
-    image: wordpress:latest
+      db:
+        condition: service_healthy
     volumes:
-      - wordpress:/var/www/html
-      - ./wp-content/plugins/example-plugin:/var/www/html/wp-content/plugins/example-plugin
-      - .env:/var/www/html/.env
+      - ./wp-content:/var/www/html/wp-content
+      - ./.env:/var/www/html/.env
+    environment:
+      WORDPRESS_DB_NAME: wp_manager_site
+      WORDPRESS_DB_USER: admin
+      WORDPRESS_DB_PASSWORD: admin
+      WORDPRESS_DB_HOST: 193.18.0.3
+      WORDPRESS_DB_CHARSET: utf8
+      WORDPRESS_DB_COLLATE: ""
+      WORDPRESS_CONFIG_EXTRA: |
+        define( 'FS_METHOD', 'direct' );
     env_file: .env
     ports:
       - "8000:80"
@@ -35,7 +53,6 @@ services:
 
 volumes:
   db_data: {}
-  wordpress: {}
 
 networks:
   wp_network:
