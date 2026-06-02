@@ -12,10 +12,13 @@
 !docker/
 !wp-content/
 
-# wp-content: only mu-plugins, plugins and themes
+# wp-content: only mu-plugins, plugins, themes, upgrade (empty dir for installs)
 wp-content/*
 !wp-content/mu-plugins/
-wp-content/plugins/
+!wp-content/upgrade/
+wp-content/upgrade/*
+!wp-content/upgrade/.gitkeep
+wp-content/plugins/*
 !wp-content/themes/
 
 # ignore these plugins

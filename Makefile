@@ -49,8 +49,13 @@ wait-db: ## Wait until MySQL is ready
 	@until $(COMPOSE) exec -T db mysqladmin ping -h localhost -u"$(WORDPRESS_DB_USER)" -p"$(WORDPRESS_DB_PASSWORD)" --silent 2>/dev/null; do sleep 2; done
 	@echo "Database is ready."
 
-permissions: ## Fix wp-content ownership
-	$(COMPOSE) exec -T $(SERVICE) chown -R www-data:www-data /var/www/html/wp-content
+permissions: ## Fix wp-content ownership (required for plugin/theme installs)
+	$(COMPOSE) exec -T $(SERVICE) bash -c '\
+		mkdir -p /var/www/html/wp-content/{upgrade,uploads,cache,plugins,themes} && \
+		chown -R www-data:www-data /var/www/html/wp-content && \
+		find /var/www/html/wp-content -type d -exec chmod 775 {} \; && \
+		find /var/www/html/wp-content -type f -exec chmod 664 {} \;'
+	@echo "wp-content is writable by www-data (upgrade, uploads, plugins)."
 
 wp: ## Run WP-CLI (e.g. make wp CMD="plugin list")
 	@test -n "$(CMD)" || (echo "Usage: make wp CMD=\"plugin list\"" && exit 1)
